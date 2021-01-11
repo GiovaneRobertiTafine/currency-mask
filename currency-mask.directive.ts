@@ -14,6 +14,8 @@ export interface Options {
     prefix?: string;
     precision?: number;
     allowNegative?: boolean;
+    thousands?: string;
+    decimal?: string;
 }
 
 @Directive({
@@ -71,6 +73,8 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
         if (!this.options?.precision) this.options.precision = 2;
         if (!this.options?.prefix) this.options.prefix = '';
         if (!this.options?.allowNegative) this.options.allowNegative = true;
+        if (!this.options?.thousands) this.options.thousands = '.';
+        if (!this.options?.decimal) this.options.decimal = ',';
         this.el.style.textAlign = 'right';
     }
 

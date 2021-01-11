@@ -28,7 +28,7 @@ export class CurrencyMaskServiceService {
 
         if (initalValue.length <= options.precision + 1) {
             if (initalValue.length === options.precision + 1) {
-                let decimal = ',' + initalValue.substring(initalValue.length - options.precision);
+                let decimal = options.decimal + initalValue.substring(initalValue.length - options.precision);
                 numero = initalValue.substring(0, initalValue.length - options.precision) + decimal;
             } else {
                 const array2: string[] = new Array(options.precision);
@@ -48,24 +48,24 @@ export class CurrencyMaskServiceService {
                     decimal += array2[index];
                 });
 
-                decimal = ',' + decimal;
+                decimal = options.decimal + decimal;
                 numero = '0' + decimal;
             }
         } else {
-            let decimal = ',' + initalValue.substring(initalValue.length - options.precision);
+            let decimal = options.decimal + initalValue.substring(initalValue.length - options.precision);
 
             numero = initalValue.substring(0, initalValue.length - options.precision) + decimal;
 
         }
 
-        if (numero.substring(0, numero.indexOf(',')).length > 3) {
-            let num = numero.substring(0, numero.indexOf(','));
+        if (numero.substring(0, numero.indexOf(options.decimal)).length > 3) {
+            let num = numero.substring(0, numero.indexOf(options.decimal));
             let arrayPonto = num.split('').slice(0).reverse();
             let numFormatado = '';
 
             arrayPonto.map((num) => {
                 if ((numFormatado.replace(/[^0-9]*/g, '').length % 3) === 0 && numFormatado.replace(/[^0-9]*/g, '').length !== 0) {
-                    numFormatado = num + '.' + numFormatado;
+                    numFormatado = num + options.thousands + numFormatado;
                 } else {
                     numFormatado = num + numFormatado;
                 }
