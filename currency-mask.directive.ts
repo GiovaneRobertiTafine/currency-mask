@@ -17,6 +17,7 @@ export interface Options {
     thousands?: string;
     decimal?: string;
     suffix?: string;
+    typeReturn?: 'string' | 'number';
 }
 
 @Directive({
@@ -78,7 +79,9 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
         if (!this.options.decimal) this.options.decimal = ',';
         this.options.prefix = this.options.prefix ? this.options.prefix + ' ' : '';
         this.options.suffix = this.options.suffix ? ' ' + this.options.suffix : '';
+        if (!this.options.typeReturn || (this.options.typeReturn !== 'string' && this.options.typeReturn !== 'number')) this.options.typeReturn = 'string';
         this.el.style.textAlign = 'right';
+
     }
 
     // // On Focus remove all non-digit or decimal separator values
@@ -113,8 +116,9 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
 
     @HostListener('input', ['$event.target.value'])
     onInput(value) {
-        this.innerValue = this.currencyMaskService.parse(value, this.options, this.keyCode);
-        this.el.value = this.currencyMaskService.transform(this.innerValue, this.options);
+        let valueParse = this.currencyMaskService.parse(value, this.options, this.keyCode);
+        this.innerValue = this.options.typeReturn === 'number' ? +valueParse : valueParse;
+        this.el.value = this.currencyMaskService.transform(valueParse, this.options);
 
         if (this.innerValue) {
             this.renderer.setAttribute(this.elementRef.nativeElement, 'value', this.innerValue);
@@ -134,7 +138,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
         // } else if (key !== 46 && key > 31 && (key < 48 || key > 57)) {
         //     event.preventDefault();
         // }
-        if (!((keyCode >= 48 && keyCode <= 57) || keyCode === 45 || keyCode === 43 || keyCode === 8)) {
+        if (!((keyCode >= 48 && keyCode <= 57) || keyCode === 45 || keyCode === 43 || keyCode === 8 || keyCode === 189 || keyCode === 187)) {
             this.keyCode = null;
             event.preventDefault();
         } else {

@@ -77,17 +77,17 @@ export class CurrencyMaskServiceService {
         if (options.allowNegative) {
             if (value.substring(0, 1) === '-') {
                 value.replace('-', '');
-                return '-' + options.prefix + ' ' + numero + options.suffix;
+                return '-' + options.prefix + numero + options.suffix;
             }
 
             if (value.substring(0, 1) === '+') {
                 value.replace('-', '');
-                return options.prefix + ' ' + numero + options.suffix;
+                return options.prefix + numero + options.suffix;
             }
 
         }
 
-        return options.prefix + ' ' + numero + options.suffix;
+        return options.prefix + numero + options.suffix;
     }
 
     parse(value: string, options?: Options, keyCode?: number) {
@@ -112,7 +112,7 @@ export class CurrencyMaskServiceService {
         if (+initalValue === 0) {
             return null;
         }
-        console.log(initalValue);
+
         if (initalValue.length <= options.precision + 1) {
             if (initalValue.length === options.precision + 1) {
                 let decimal = '.' + initalValue.substring(initalValue.length - options.precision);
