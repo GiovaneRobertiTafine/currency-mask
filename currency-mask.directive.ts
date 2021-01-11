@@ -1,4 +1,4 @@
-import { Directive, ElementRef, forwardRef, HostListener, Input, Renderer2 } from '@angular/core';
+import { AfterViewInit, Directive, ElementRef, forwardRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { CurrencyMaskServiceService } from "./currency-mask-service.service";
 
@@ -12,27 +12,22 @@ export const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 
 interface Options {
     prefix?: string;
-    precision?: string;
+    precision?: number;
+    allowNegative?: boolean;
 }
 
 @Directive({
     selector: '[currency-mask]',
     providers: [CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR]
 })
-export class CurrencyMaskDirective implements ControlValueAccessor {
-    @Input() precision?: string;
-    @Input() prefix?: string;
-    @Input() allowNegative?: boolean;
+export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewInit {
+    @Input() options?: Options = {};
 
     private el: HTMLInputElement;
     private innerValue: any;
 
     constructor(public elementRef: ElementRef, private currencyMaskService: CurrencyMaskServiceService, private renderer: Renderer2) {
         this.el = elementRef.nativeElement;
-
-        if (!this.precision) this.precision = '2';
-        if (!this.prefix) this.prefix = '';
-        if (!this.allowNegative) this.allowNegative = true;
     }
 
     private onTouchedCallback: () => void = noop;
@@ -56,7 +51,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor {
             return;
         }
         if (value !== this.innerValue) {
-            this.el.value = this.currencyMaskService.transform(value, +this.precision, this.prefix, this.allowNegative);
+            this.el.value = this.currencyMaskService.transform(value, this.options.precision, this.options.prefix, this.options.allowNegative);
             if (value) {
                 this.renderer.setAttribute(this.elementRef.nativeElement, 'value', value);
             }
@@ -73,6 +68,9 @@ export class CurrencyMaskDirective implements ControlValueAccessor {
     }
 
     ngAfterViewInit() {
+        if (!this.options?.precision) this.options.precision = 2;
+        if (!this.options?.prefix) this.options.prefix = '';
+        if (!this.options?.allowNegative) this.options.allowNegative = true;
         this.el.style.textAlign = 'right';
     }
 
@@ -108,8 +106,8 @@ export class CurrencyMaskDirective implements ControlValueAccessor {
 
     @HostListener('input', ['$event.target.value'])
     onInput(value) {
-        this.innerValue = this.currencyMaskService.parse(value, +this.precision, this.allowNegative);
-        this.el.value = this.currencyMaskService.transform(this.innerValue, +this.precision, this.prefix, this.allowNegative);
+        this.innerValue = this.currencyMaskService.parse(value, this.options.precision, this.options.allowNegative);
+        this.el.value = this.currencyMaskService.transform(this.innerValue, this.options.precision, this.options.prefix, this.options.allowNegative);
 
         if (this.innerValue) {
             this.renderer.setAttribute(this.elementRef.nativeElement, 'value', this.innerValue);
