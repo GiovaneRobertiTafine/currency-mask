@@ -16,6 +16,7 @@ export interface Options {
     allowNegative?: boolean;
     thousands?: string;
     decimal?: string;
+    suffix?: string;
 }
 
 @Directive({
@@ -27,6 +28,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
 
     private el: HTMLInputElement;
     private innerValue: any;
+    private keyCode: number;
 
     constructor(public elementRef: ElementRef, private currencyMaskService: CurrencyMaskServiceService, private renderer: Renderer2) {
         this.el = elementRef.nativeElement;
@@ -70,11 +72,12 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
     }
 
     ngAfterViewInit() {
-        if (!this.options?.precision) this.options.precision = 2;
-        if (!this.options?.prefix) this.options.prefix = '';
-        if (!this.options?.allowNegative) this.options.allowNegative = true;
-        if (!this.options?.thousands) this.options.thousands = '.';
-        if (!this.options?.decimal) this.options.decimal = ',';
+        if (!this.options.precision) this.options.precision = 2;
+        if (!this.options.allowNegative) this.options.allowNegative = true;
+        if (!this.options.thousands) this.options.thousands = '.';
+        if (!this.options.decimal) this.options.decimal = ',';
+        this.options.prefix = this.options.prefix ? this.options.prefix + ' ' : '';
+        this.options.suffix = this.options.suffix ? ' ' + this.options.suffix : '';
         this.el.style.textAlign = 'right';
     }
 
@@ -110,7 +113,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
 
     @HostListener('input', ['$event.target.value'])
     onInput(value) {
-        this.innerValue = this.currencyMaskService.parse(value, this.options);
+        this.innerValue = this.currencyMaskService.parse(value, this.options, this.keyCode);
         this.el.value = this.currencyMaskService.transform(this.innerValue, this.options);
 
         if (this.innerValue) {
@@ -120,7 +123,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
     }
 
     // Prevent user to enter anything but digits and decimal separator
-    @HostListener('keypress', ['$event'])
+    @HostListener('keydown', ['$event'])
     onKeyPress(event) {
         const key = event.which || event.keyCode || 0;
         const keyCode = event.keyCode;
@@ -131,9 +134,14 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
         // } else if (key !== 46 && key > 31 && (key < 48 || key > 57)) {
         //     event.preventDefault();
         // }
-        if (!((keyCode >= 48 && keyCode <= 57) || keyCode === 45 || keyCode === 43)) {
+        if (!((keyCode >= 48 && keyCode <= 57) || keyCode === 45 || keyCode === 43 || keyCode === 8)) {
+            this.keyCode = null;
             event.preventDefault();
+        } else {
+            this.keyCode = keyCode;
         }
+
+
     }
 
 

@@ -77,20 +77,20 @@ export class CurrencyMaskServiceService {
         if (options.allowNegative) {
             if (value.substring(0, 1) === '-') {
                 value.replace('-', '');
-                return '-' + options.prefix + ' ' + numero;
+                return '-' + options.prefix + ' ' + numero + options.suffix;
             }
 
             if (value.substring(0, 1) === '+') {
                 value.replace('-', '');
-                return options.prefix + ' ' + numero;
+                return options.prefix + ' ' + numero + options.suffix;
             }
 
         }
 
-        return options.prefix + ' ' + numero;
+        return options.prefix + ' ' + numero + options.suffix;
     }
 
-    parse(value: string, options?: Options) {
+    parse(value: string, options?: Options, keyCode?: number) {
         if (value == undefined || value === '' || value === '0') {
             return null;
         }
@@ -98,9 +98,6 @@ export class CurrencyMaskServiceService {
         let initalValue = value.replace(/[^0-9]*/g, '');
         let numero = '';
 
-        if (+initalValue === 0) {
-            return null;
-        }
 
         if (initalValue.length > 1) {
             let arrayVerify = initalValue.split('');
@@ -108,6 +105,14 @@ export class CurrencyMaskServiceService {
 
         }
 
+        if (options.suffix && keyCode === 8) {
+            initalValue = initalValue.substring(0, initalValue.length - 1);
+        }
+
+        if (+initalValue === 0) {
+            return null;
+        }
+        console.log(initalValue);
         if (initalValue.length <= options.precision + 1) {
             if (initalValue.length === options.precision + 1) {
                 let decimal = '.' + initalValue.substring(initalValue.length - options.precision);
