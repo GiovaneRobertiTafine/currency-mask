@@ -10,7 +10,7 @@ export const CUSTOM_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     multi: true
 };
 
-interface Options {
+export interface Options {
     prefix?: string;
     precision?: number;
     allowNegative?: boolean;
@@ -51,7 +51,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
             return;
         }
         if (value !== this.innerValue) {
-            this.el.value = this.currencyMaskService.transform(value, this.options.precision, this.options.prefix, this.options.allowNegative);
+            this.el.value = this.currencyMaskService.transform(value, this.options);
             if (value) {
                 this.renderer.setAttribute(this.elementRef.nativeElement, 'value', value);
             }
@@ -106,8 +106,8 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
 
     @HostListener('input', ['$event.target.value'])
     onInput(value) {
-        this.innerValue = this.currencyMaskService.parse(value, this.options.precision, this.options.allowNegative);
-        this.el.value = this.currencyMaskService.transform(this.innerValue, this.options.precision, this.options.prefix, this.options.allowNegative);
+        this.innerValue = this.currencyMaskService.parse(value, this.options);
+        this.el.value = this.currencyMaskService.transform(this.innerValue, this.options);
 
         if (this.innerValue) {
             this.renderer.setAttribute(this.elementRef.nativeElement, 'value', this.innerValue);
@@ -119,6 +119,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
     @HostListener('keypress', ['$event'])
     onKeyPress(event) {
         const key = event.which || event.keyCode || 0;
+        const keyCode = event.keyCode;
         // if (key === 45 && !this.allowNegative) {
         //     event.preventDefault();
         // } else if (key === 45 && this.allowNegative) {
@@ -126,6 +127,9 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
         // } else if (key !== 46 && key > 31 && (key < 48 || key > 57)) {
         //     event.preventDefault();
         // }
+        if (!((keyCode >= 48 && keyCode <= 57) || keyCode === 45 || keyCode === 43)) {
+            event.preventDefault();
+        }
     }
 
 

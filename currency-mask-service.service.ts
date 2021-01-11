@@ -1,4 +1,5 @@
 import { Injectable } from '@angular/core';
+import { Options } from './currency-mask.directive';
 
 @Injectable({
     providedIn: 'root'
@@ -7,7 +8,7 @@ export class CurrencyMaskServiceService {
 
     constructor() { }
 
-    transform(value: string, precision: number, prefix: string, allowNegative: boolean) {
+    transform(value: string, options?: Options) {
         if (value == undefined || value === '' || value === '0') {
             return null;
         }
@@ -25,12 +26,12 @@ export class CurrencyMaskServiceService {
 
         }
 
-        if (initalValue.length <= precision + 1) {
-            if (initalValue.length === precision + 1) {
-                let decimal = ',' + initalValue.substring(initalValue.length - precision);
-                numero = initalValue.substring(0, initalValue.length - precision) + decimal;
+        if (initalValue.length <= options.precision + 1) {
+            if (initalValue.length === options.precision + 1) {
+                let decimal = ',' + initalValue.substring(initalValue.length - options.precision);
+                numero = initalValue.substring(0, initalValue.length - options.precision) + decimal;
             } else {
-                const array2: string[] = new Array(precision);
+                const array2: string[] = new Array(options.precision);
 
                 for (let index = 0; index < array2.length; index++) {
                     if (initalValue.substring(initalValue.length - (index + 1), initalValue.length - index)) {
@@ -51,9 +52,9 @@ export class CurrencyMaskServiceService {
                 numero = '0' + decimal;
             }
         } else {
-            let decimal = ',' + initalValue.substring(initalValue.length - precision);
+            let decimal = ',' + initalValue.substring(initalValue.length - options.precision);
 
-            numero = initalValue.substring(0, initalValue.length - precision) + decimal;
+            numero = initalValue.substring(0, initalValue.length - options.precision) + decimal;
 
         }
 
@@ -73,22 +74,23 @@ export class CurrencyMaskServiceService {
             numero = numero.replace(num, numFormatado);
         }
 
-        if (allowNegative) {
+        if (options.allowNegative) {
             if (value.substring(0, 1) === '-') {
                 value.replace('-', '');
-                return '-' + prefix + ' ' + numero;
+                return '-' + options.prefix + ' ' + numero;
             }
 
             if (value.substring(0, 1) === '+') {
                 value.replace('-', '');
-                return prefix + ' ' + numero;
+                return options.prefix + ' ' + numero;
             }
+
         }
 
-        return prefix + ' ' + numero;
+        return options.prefix + ' ' + numero;
     }
 
-    parse(value: string, precision: number, allowNegative: boolean) {
+    parse(value: string, options?: Options) {
         if (value == undefined || value === '' || value === '0') {
             return null;
         }
@@ -106,12 +108,12 @@ export class CurrencyMaskServiceService {
 
         }
 
-        if (initalValue.length <= precision + 1) {
-            if (initalValue.length === precision + 1) {
-                let decimal = '.' + initalValue.substring(initalValue.length - precision);
-                numero = initalValue.substring(0, initalValue.length - precision) + decimal;
+        if (initalValue.length <= options.precision + 1) {
+            if (initalValue.length === options.precision + 1) {
+                let decimal = '.' + initalValue.substring(initalValue.length - options.precision);
+                numero = initalValue.substring(0, initalValue.length - options.precision) + decimal;
             } else {
-                const array: string[] = new Array(precision);
+                const array: string[] = new Array(options.precision);
 
                 for (let index = 0; index < array.length; index++) {
                     if (initalValue.substring(initalValue.length - (index + 1), initalValue.length - index)) {
@@ -132,19 +134,23 @@ export class CurrencyMaskServiceService {
                 numero = '0' + decimal;
             }
         } else {
-            let decimal = '.' + initalValue.substring(initalValue.length - precision);
+            let decimal = '.' + initalValue.substring(initalValue.length - options.precision);
 
-            numero = initalValue.substring(0, initalValue.length - precision) + decimal;
+            numero = initalValue.substring(0, initalValue.length - options.precision) + decimal;
 
         }
 
-        if (allowNegative) {
+        if (options.allowNegative) {
             if (value.substring(value.length - 1,) === '-') {
                 return '-' + numero;
             }
 
             if (value.substring(value.length - 1,) === '+') {
                 return numero;
+            }
+
+            if (value.substring(0, 1) === '-') {
+                return '-' + numero;
             }
         }
 
