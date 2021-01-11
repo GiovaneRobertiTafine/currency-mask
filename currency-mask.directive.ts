@@ -22,6 +22,7 @@ interface Options {
 export class CurrencyMaskDirective implements ControlValueAccessor {
     @Input() precision?: string;
     @Input() prefix?: string;
+    @Input() allowNegative?: boolean;
 
     private el: HTMLInputElement;
     private innerValue: any;
@@ -30,6 +31,8 @@ export class CurrencyMaskDirective implements ControlValueAccessor {
         this.el = elementRef.nativeElement;
 
         if (!this.precision) this.precision = '2';
+        if (!this.prefix) this.prefix = '';
+        if (!this.allowNegative) this.allowNegative = true;
     }
 
     private onTouchedCallback: () => void = noop;
@@ -53,7 +56,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor {
             return;
         }
         if (value !== this.innerValue) {
-            this.el.value = this.currencyMaskService.transform(value, +this.precision, this.prefix);
+            this.el.value = this.currencyMaskService.transform(value, +this.precision, this.prefix, this.allowNegative);
             if (value) {
                 this.renderer.setAttribute(this.elementRef.nativeElement, 'value', value);
             }
@@ -73,11 +76,40 @@ export class CurrencyMaskDirective implements ControlValueAccessor {
         this.el.style.textAlign = 'right';
     }
 
+    // // On Focus remove all non-digit or decimal separator values
+    // @HostListener('focus', ['$event.target.value'])
+    // onfocus(value) {
+    //     this.el.value = this.currencyMaskService.parse(value, this.allowNegative);
+    // }
+
+    // // On Blue remove all symbols except last . and set to currency format
+    // @HostListener('blur', ['$event.target.value'])
+    // onBlur(value) {
+    //     this.onTouchedCallback();
+    //     this.el.value = this.currencyMaskService.transform(value, this.allowNegative);
+    //     this.innerValue = this.currencyMaskService.parse(this.el.value, this.allowNegative);
+    //     this.onChangeCallback(this.innerValue);
+    //     if (this.innerValue) {
+    //         this.renderer.setAttribute(this.elementRef.nativeElement, 'value', this.innerValue);
+    //     }
+    // }
+
+    // // On Change remove all symbols except last . and set to currency format
+    // @HostListener('change', ['$event.target.value'])
+    // onChange(value) {
+    //     this.el.value = this.currencyMaskService.transform(value, this.allowNegative);
+    //     this.innerValue = this.currencyMaskService.parse(this.el.value, this.allowNegative);
+    //     this.onChangeCallback(this.innerValue);
+    //     if (this.innerValue) {
+    //         this.renderer.setAttribute(this.elementRef.nativeElement, 'value', this.innerValue);
+    //     }
+    // }
+
 
     @HostListener('input', ['$event.target.value'])
     onInput(value) {
-        this.innerValue = this.currencyMaskService.parse(value, +this.precision);
-        this.el.value = this.currencyMaskService.transform(this.innerValue, +this.precision, this.prefix);
+        this.innerValue = this.currencyMaskService.parse(value, +this.precision, this.allowNegative);
+        this.el.value = this.currencyMaskService.transform(this.innerValue, +this.precision, this.prefix, this.allowNegative);
 
         if (this.innerValue) {
             this.renderer.setAttribute(this.elementRef.nativeElement, 'value', this.innerValue);
@@ -86,17 +118,17 @@ export class CurrencyMaskDirective implements ControlValueAccessor {
     }
 
     // Prevent user to enter anything but digits and decimal separator
-    // @HostListener('keypress', ['$event'])
-    // onKeyPress(event) {
-    //     const key = event.which || event.keyCode || 0;
-    //     // if (key === 45 && !this.allowNegative) {
-    //     //     event.preventDefault();
-    //     // } else if (key === 45 && this.allowNegative) {
-    //     //     // allow negative numbers
-    //     // } else if (key !== 46 && key > 31 && (key < 48 || key > 57)) {
-    //     //     event.preventDefault();
-    //     // }
-    // }
+    @HostListener('keypress', ['$event'])
+    onKeyPress(event) {
+        const key = event.which || event.keyCode || 0;
+        // if (key === 45 && !this.allowNegative) {
+        //     event.preventDefault();
+        // } else if (key === 45 && this.allowNegative) {
+        //     // allow negative numbers
+        // } else if (key !== 46 && key > 31 && (key < 48 || key > 57)) {
+        //     event.preventDefault();
+        // }
+    }
 
 
 

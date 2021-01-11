@@ -7,7 +7,7 @@ export class CurrencyMaskServiceService {
 
     constructor() { }
 
-    transform(value: string, precision?: number, prefix?: string) {
+    transform(value: string, precision: number, prefix: string, allowNegative: boolean) {
         if (value == undefined || value === '' || value === '0') {
             return null;
         }
@@ -73,11 +73,22 @@ export class CurrencyMaskServiceService {
             numero = numero.replace(num, numFormatado);
         }
 
+        if (allowNegative) {
+            if (value.substring(0, 1) === '-') {
+                value.replace('-', '');
+                return '-' + prefix + ' ' + numero;
+            }
+
+            if (value.substring(0, 1) === '+') {
+                value.replace('-', '');
+                return prefix + ' ' + numero;
+            }
+        }
 
         return prefix + ' ' + numero;
     }
 
-    parse(value: string, precision?: number) {
+    parse(value: string, precision: number, allowNegative: boolean) {
         if (value == undefined || value === '' || value === '0') {
             return null;
         }
@@ -127,7 +138,17 @@ export class CurrencyMaskServiceService {
 
         }
 
+        if (allowNegative) {
+            if (value.substring(value.length - 1,) === '-') {
+                return '-' + numero;
+            }
+
+            if (value.substring(value.length - 1,) === '+') {
+                return numero;
+            }
+        }
 
         return numero;
     }
+
 }
