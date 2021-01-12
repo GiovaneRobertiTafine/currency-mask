@@ -18,6 +18,7 @@ export interface Options {
     decimal?: string;
     suffix?: string;
     typeReturn?: 'string' | 'number';
+    nullable?: boolean;
 }
 
 @Directive({
@@ -52,15 +53,34 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
     }
 
     writeValue(value: any) {
-        if (value === '' || value === undefined || value === null) {
-            return;
-        }
-        if (value !== this.innerValue) {
-            this.el.value = this.currencyMaskService.transform(value, this.options);
-            if (value) {
-                this.renderer.setAttribute(this.elementRef.nativeElement, 'value', value);
-            }
-            this.innerValue = value;
+        if (!this.options.precision) this.options.precision = 2;
+        if (this.options.allowNegative !== false) this.options.allowNegative = true;
+        if (!this.options.thousands) this.options.thousands = '.';
+        if (!this.options.decimal) this.options.decimal = ',';
+        this.options.prefix = this.options.prefix ? this.options.prefix + ' ' : '';
+        this.options.suffix = this.options.suffix ? ' ' + this.options.suffix : '';
+        if (!this.options.typeReturn || (this.options.typeReturn !== 'string' && this.options.typeReturn !== 'number')) this.options.typeReturn = 'string';
+        if (!this.options.nullable) this.options.nullable = false;
+        this.el.style.textAlign = 'right';
+
+        // if (value === '' || value === undefined || value === null) {
+        //     return;
+        // }
+        // if (value !== this.innerValue) {
+        //     this.el.value = this.currencyMaskService.transform(value, this.options);
+        //     console.log(this.el.value);
+        //     if (value) {
+        //         this.renderer.setAttribute(this.elementRef.nativeElement, 'value', value);
+        //     }
+        //     this.innerValue = value;
+        // }
+
+        if (!this.options.nullable) {
+            this.el.value = this.currencyMaskService.transform('0', this.options);
+            let valueParse = this.currencyMaskService.parse(this.el.value, this.options, this.keyCode);
+            this.innerValue = this.options.typeReturn === 'number' && valueParse ? +valueParse : valueParse;
+        } else {
+            this.innerValue = null;
         }
     }
 
@@ -73,15 +93,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
     }
 
     ngAfterViewInit() {
-        if (!this.options.precision) this.options.precision = 2;
-        if (!this.options.allowNegative) this.options.allowNegative = true;
-        if (!this.options.thousands) this.options.thousands = '.';
-        if (!this.options.decimal) this.options.decimal = ',';
-        this.options.prefix = this.options.prefix ? this.options.prefix + ' ' : '';
-        this.options.suffix = this.options.suffix ? ' ' + this.options.suffix : '';
-        if (!this.options.typeReturn || (this.options.typeReturn !== 'string' && this.options.typeReturn !== 'number')) this.options.typeReturn = 'string';
-        this.el.style.textAlign = 'right';
-
+        setTimeout(() => this.onChangeCallback(this.innerValue));
     }
 
     // // On Focus remove all non-digit or decimal separator values
@@ -117,7 +129,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
     @HostListener('input', ['$event.target.value'])
     onInput(value) {
         let valueParse = this.currencyMaskService.parse(value, this.options, this.keyCode);
-        this.innerValue = this.options.typeReturn === 'number' ? +valueParse : valueParse;
+        this.innerValue = this.options.typeReturn === 'number' && valueParse ? +valueParse : valueParse;
         this.el.value = this.currencyMaskService.transform(valueParse, this.options);
 
         if (this.innerValue) {
@@ -145,9 +157,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
             this.keyCode = keyCode;
         }
 
-
     }
-
 
 
 }

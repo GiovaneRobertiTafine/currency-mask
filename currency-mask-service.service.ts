@@ -9,16 +9,13 @@ export class CurrencyMaskServiceService {
     constructor() { }
 
     transform(value: string, options?: Options) {
-        if (value == undefined || value === '' || value === '0') {
-            return null;
+        if (value == undefined || value === '' || value === '0' || +value.replace(/[^0-9]*/g, '') === 0) {
+            if (options.nullable) return null;
+            value = '0';
         }
 
         let initalValue = value.replace(/[^0-9]*/g, '');
         let numero = '';
-
-        if (+initalValue === 0) {
-            return null;
-        }
 
         if (initalValue.length > 1) {
             let arrayVerify = initalValue.split('');
@@ -91,8 +88,8 @@ export class CurrencyMaskServiceService {
     }
 
     parse(value: string, options?: Options, keyCode?: number) {
-        if (value == undefined || value === '' || value === '0') {
-            return null;
+        if (value == undefined || value === '' || value === '0' || +value.replace(/[^0-9]*/g, '') === 0) {
+            return options.nullable ? null : '0';
         }
 
         let initalValue = value.replace(/[^0-9]*/g, '');
@@ -107,10 +104,6 @@ export class CurrencyMaskServiceService {
 
         if (options.suffix && keyCode === 8) {
             initalValue = initalValue.substring(0, initalValue.length - 1);
-        }
-
-        if (+initalValue === 0) {
-            return null;
         }
 
         if (initalValue.length <= options.precision + 1) {
@@ -147,16 +140,13 @@ export class CurrencyMaskServiceService {
 
         if (options.allowNegative) {
             if (value.substring(value.length - 1,) === '-') {
-                return '-' + numero;
+                numero = '-' + numero;
+            } else if (value.substring(value.length - 1,) === '+') {
+                numero = numero;
+            } else if (value.substring(0, 1) === '-') {
+                numero = '-' + numero;
             }
 
-            if (value.substring(value.length - 1,) === '+') {
-                return numero;
-            }
-
-            if (value.substring(0, 1) === '-') {
-                return '-' + numero;
-            }
         }
 
         return numero;
