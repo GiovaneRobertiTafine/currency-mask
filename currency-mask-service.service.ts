@@ -88,34 +88,36 @@ export class CurrencyMaskServiceService {
     }
 
     parse(value: string, options?: Options, keyCode?: number) {
+        if (options.suffix && keyCode === 8) {
+            let valueSuffix = value.replace(/[^0-9]*/g, '');
+            value = valueSuffix.substring(0, valueSuffix.length - 1);
+        }
+
         if (value == undefined || value === '' || value === '0' || +value.replace(/[^0-9]*/g, '') === 0) {
             return options.nullable ? null : '0';
         }
 
-        let initalValue = value.replace(/[^0-9]*/g, '');
+        let initialValue = value.replace(/[^0-9]*/g, '');
         let numero = '';
 
 
-        if (initalValue.length > 1) {
-            let arrayVerify = initalValue.split('');
-            initalValue = initalValue.substring(arrayVerify.findIndex((v) => v != '0'),);
+        if (initialValue.length > 1) {
+            let arrayVerify = initialValue.split('');
+            initialValue = initialValue.substring(arrayVerify.findIndex((v) => v != '0'),);
 
         }
 
-        if (options.suffix && keyCode === 8) {
-            initalValue = initalValue.substring(0, initalValue.length - 1);
-        }
 
-        if (initalValue.length <= options.precision + 1) {
-            if (initalValue.length === options.precision + 1) {
-                let decimal = '.' + initalValue.substring(initalValue.length - options.precision);
-                numero = initalValue.substring(0, initalValue.length - options.precision) + decimal;
+        if (initialValue.length <= options.precision + 1) {
+            if (initialValue.length === options.precision + 1) {
+                let decimal = '.' + initialValue.substring(initialValue.length - options.precision);
+                numero = initialValue.substring(0, initialValue.length - options.precision) + decimal;
             } else {
                 const array: string[] = new Array(options.precision);
 
                 for (let index = 0; index < array.length; index++) {
-                    if (initalValue.substring(initalValue.length - (index + 1), initalValue.length - index)) {
-                        array[array.length - (index + 1)] = initalValue.substring(initalValue.length - (index + 1), initalValue.length - index);
+                    if (initialValue.substring(initialValue.length - (index + 1), initialValue.length - index)) {
+                        array[array.length - (index + 1)] = initialValue.substring(initialValue.length - (index + 1), initialValue.length - index);
                     }
                     else {
                         array[array.length - (index + 1)] = '0';
@@ -132,9 +134,9 @@ export class CurrencyMaskServiceService {
                 numero = '0' + decimal;
             }
         } else {
-            let decimal = '.' + initalValue.substring(initalValue.length - options.precision);
+            let decimal = '.' + initialValue.substring(initialValue.length - options.precision);
 
-            numero = initalValue.substring(0, initalValue.length - options.precision) + decimal;
+            numero = initialValue.substring(0, initialValue.length - options.precision) + decimal;
 
         }
 
