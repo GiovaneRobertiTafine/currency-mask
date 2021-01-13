@@ -100,13 +100,10 @@ export class CurrencyMaskServiceService {
         let initialValue = value.replace(/[^0-9]*/g, '');
         let numero = '';
 
-
         if (initialValue.length > 1) {
             let arrayVerify = initialValue.split('');
             initialValue = initialValue.substring(arrayVerify.findIndex((v) => v != '0'),);
-
         }
-
 
         if (initialValue.length <= options.precision + 1) {
             if (initialValue.length === options.precision + 1) {
@@ -149,6 +146,14 @@ export class CurrencyMaskServiceService {
                 numero = '-' + numero;
             }
 
+        }
+
+        if (parseFloat(numero) < options.min && options.min) {
+            numero = options.min.toFixed(options.precision).toString();
+        }
+
+        if (parseFloat(numero) > options.max && options.max) {
+            numero = options.max.toFixed(options.precision).toString();
         }
 
         return numero;

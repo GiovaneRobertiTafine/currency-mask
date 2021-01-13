@@ -19,6 +19,8 @@ export interface Options {
     suffix?: string;
     typeReturn?: 'string' | 'number';
     nullable?: boolean;
+    max?: number;
+    min?: number;
 }
 
 @Directive({
@@ -53,14 +55,16 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
     }
 
     writeValue(value: any) {
-        if (!this.options.precision) this.options.precision = 2;
-        if (this.options.allowNegative !== false) this.options.allowNegative = true;
-        if (!this.options.thousands) this.options.thousands = '.';
-        if (!this.options.decimal) this.options.decimal = ',';
-        this.options.prefix = this.options.prefix ? this.options.prefix + ' ' : '';
-        this.options.suffix = this.options.suffix ? ' ' + this.options.suffix : '';
+        if (!this.options.precision || typeof this.options.precision !== 'number') this.options.precision = 2;
+        if (this.options.allowNegative !== false || typeof this.options.allowNegative !== 'boolean') this.options.allowNegative = true;
+        if (!this.options.thousands || typeof this.options.thousands !== 'string') this.options.thousands = '.';
+        if (!this.options.decimal || typeof this.options.decimal !== 'string') this.options.decimal = ',';
+        this.options.prefix = this.options.prefix && typeof this.options.prefix === 'string' ? this.options.prefix + ' ' : '';
+        this.options.suffix = this.options.suffix && typeof this.options.suffix === 'string' ? ' ' + this.options.suffix : '';
         if (!this.options.typeReturn || (this.options.typeReturn !== 'string' && this.options.typeReturn !== 'number')) this.options.typeReturn = 'string';
-        if (!this.options.nullable) this.options.nullable = false;
+        if (!this.options.nullable || typeof this.options.nullable !== 'boolean') this.options.nullable = false;
+        if (typeof this.options.min !== 'number') this.options.min = null;
+        if (typeof this.options.max !== 'number') this.options.max = null;
         this.el.style.textAlign = 'right';
 
         // if (value === '' || value === undefined || value === null) {
@@ -75,7 +79,15 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
         //     this.innerValue = value;
         // }
 
-        if (!this.options.nullable) {
+        if (this.options.min) {
+            this.el.value = this.currencyMaskService.transform(
+                this.options.min.toFixed(this.options.precision).toString(),
+                this.options
+            );
+            let valueParse = this.currencyMaskService.parse(this.el.value, this.options, this.keyCode);
+            this.innerValue = this.options.typeReturn === 'number' && valueParse ? +valueParse : valueParse;
+
+        } else if (!this.options.nullable) {
             this.el.value = this.currencyMaskService.transform('0', this.options);
             let valueParse = this.currencyMaskService.parse(this.el.value, this.options, this.keyCode);
             this.innerValue = this.options.typeReturn === 'number' && valueParse ? +valueParse : valueParse;
