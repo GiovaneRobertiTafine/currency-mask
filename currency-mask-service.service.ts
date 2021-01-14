@@ -70,16 +70,10 @@ export class CurrencyMaskServiceService {
 
             numero = numero.replace(num, numFormatado);
         }
-
         if (options.allowNegative) {
             if (value.substring(0, 1) === '-') {
                 value.replace('-', '');
                 return '-' + options.prefix + numero + options.suffix;
-            }
-
-            if (value.substring(0, 1) === '+') {
-                value.replace('-', '');
-                return options.prefix + numero + options.suffix;
             }
 
         }
