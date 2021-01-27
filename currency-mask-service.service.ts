@@ -72,7 +72,6 @@ export class CurrencyMaskServiceService {
         }
         if (options.allowNegative) {
             if (value.substring(0, 1) === '-') {
-                value.replace('-', '');
                 return '-' + options.prefix + numero + options.suffix;
             }
 
@@ -151,6 +150,57 @@ export class CurrencyMaskServiceService {
         }
 
         return numero;
+    }
+
+    pipe(value: string, options: Options) {
+        if (value == undefined || value === '' || value === '0' || +value.replace(/[^0-9]*/g, '') === 0) {
+            if (options.nullable) {
+                return null;
+            } else {
+                options.precision ? value = ('0' + options.decimal).padEnd(options.precision + ('0' + options.decimal).length, '0') : value = '0';
+            }
+        }
+
+        if (parseFloat(value) < options.min && options.min) {
+            value = options.min.toFixed(options.precision).toString();
+        }
+
+        if (parseFloat(value) > options.max && options.max) {
+            value = options.max.toFixed(options.precision).toString();
+        }
+
+        if (value.indexOf('.') != -1 && value.substring(value.indexOf('.') + 1,).length < options.precision) {
+            let valueTranform = value.substring(value.indexOf('.') + 1,).padEnd(options.precision, '0');
+            value = value.substring(0, value.indexOf('.')) + options.decimal + valueTranform;
+        }
+
+        let numero = '';
+        numero = value.replace('-', '');
+
+        if (numero.substring(0, numero.indexOf(options.decimal)).length > 3) {
+            let num = numero.substring(0, numero.indexOf(options.decimal));
+            let arrayPonto = num.split('').slice(0).reverse();
+            let numFormatado = '';
+
+            arrayPonto.map((num) => {
+                if ((numFormatado.replace(/[^0-9]*/g, '').length % 3) === 0 && numFormatado.replace(/[^0-9]*/g, '').length !== 0) {
+                    numFormatado = num + options.thousands + numFormatado;
+                } else {
+                    numFormatado = num + numFormatado;
+                }
+            });
+
+            numero = numero.replace(num, numFormatado);
+        }
+
+        if (options.allowNegative) {
+            if (value.substring(0, 1) === '-') {
+                numero = numero.replace('-', '');
+                return '-' + options.prefix + numero + options.suffix;
+            }
+        }
+
+        return options.prefix + numero + options.suffix;
     }
 
 }
