@@ -21,6 +21,7 @@ export interface Options {
     nullable?: boolean;
     max?: number;
     min?: number;
+    textAlign?: 'left' | 'right';
 }
 
 @Directive({
@@ -65,7 +66,11 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
         if (!this.options.nullable || typeof this.options.nullable !== 'boolean') this.options.nullable = false;
         if (typeof this.options.min !== 'number') this.options.min = null;
         if (typeof this.options.max !== 'number') this.options.max = null;
-        this.el.style.textAlign = 'right';
+        if (!this.options.textAlign || this.options.textAlign !== 'right') {
+            this.el.style.textAlign = 'left';
+        } else {
+            this.el.style.textAlign = 'right';
+        }
 
         // if (value === '' || value === undefined || value === null) {
         //     return;
