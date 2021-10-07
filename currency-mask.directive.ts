@@ -97,6 +97,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
             let valueParse = this.currencyMaskService.parse(this.el.value, this.options, this.keyCode);
             this.innerValue = this.options.typeReturn === 'number' && valueParse ? +valueParse : valueParse;
         } else {
+            this.el.value = null;
             this.innerValue = null;
         }
     }
@@ -167,7 +168,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
         // } else if (key !== 46 && key > 31 && (key < 48 || key > 57)) {
         //     event.preventDefault();
         // }
-        if (!((keyCode >= 48 && keyCode <= 57) || keyCode === 45 || keyCode === 43 || keyCode === 8 || keyCode === 189 || keyCode === 187)) {
+        if (!((keyCode >= 48 && keyCode <= 57) || (keyCode >= 96 && keyCode <= 105) || keyCode === 45 || keyCode === 43 || keyCode === 8 || keyCode === 189 || keyCode === 187)) {
             this.keyCode = null;
             event.preventDefault();
         } else {
