@@ -172,6 +172,12 @@ export class CurrencyMaskService {
         if (value.indexOf('.') != -1 && value.substring(value.indexOf('.') + 1,).length < options.precision) {
             let valueTranform = value.substring(value.indexOf('.') + 1,).padEnd(options.precision, '0');
             value = value.substring(0, value.indexOf('.')) + options.decimal + valueTranform;
+        } else if (value.indexOf('.') != -1 && value.substring(value.indexOf('.') + 1,).length > options.precision) {
+            let valueTranform = value.substring(value.indexOf('.') + 1, (value.indexOf('.') + 1) + options.precision);
+            value = value.substring(0, value.indexOf('.')) + options.decimal + valueTranform;
+        } else if (value.indexOf('.') === -1 && options.precision) {
+            console.log((value + options.decimal).padEnd(options.precision + (value + options.decimal).length, '0'));
+            value = (value + options.decimal).padEnd(options.precision + (value + options.decimal).length, '0');
         }
 
         let numero = '';
