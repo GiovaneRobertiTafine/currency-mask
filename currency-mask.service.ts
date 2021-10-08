@@ -162,22 +162,25 @@ export class CurrencyMaskService {
         }
 
         if (parseFloat(value) < options.min && options.min) {
-            value = options.min.toFixed(options.precision).toString();
+            value = (options.min + options.decimal).padEnd((options.min + options.decimal).length + options.precision, "0");
+            verificacaoMinMax = true;
         }
 
         if (parseFloat(value) > options.max && options.max) {
-            value = options.max.toFixed(options.precision).toString();
+            value = (options.max + options.decimal).padEnd((options.max + options.decimal).length + options.precision, "0");
+            verificacaoMinMax = true;
         }
 
-        if (value.indexOf('.') != -1 && value.substring(value.indexOf('.') + 1,).length < options.precision) {
-            let valueTranform = value.substring(value.indexOf('.') + 1,).padEnd(options.precision, '0');
-            value = value.substring(0, value.indexOf('.')) + options.decimal + valueTranform;
-        } else if (value.indexOf('.') != -1 && value.substring(value.indexOf('.') + 1,).length > options.precision) {
-            let valueTranform = value.substring(value.indexOf('.') + 1, (value.indexOf('.') + 1) + options.precision);
-            value = value.substring(0, value.indexOf('.')) + options.decimal + valueTranform;
-        } else if (value.indexOf('.') === -1 && options.precision) {
-            console.log((value + options.decimal).padEnd(options.precision + (value + options.decimal).length, '0'));
-            value = (value + options.decimal).padEnd(options.precision + (value + options.decimal).length, '0');
+        if (!verificacaoMinMax) {
+            if (value.indexOf('.') != -1 && value.substring(value.indexOf('.') + 1,).length < options.precision) {
+                let valueTranform = value.substring(value.indexOf('.') + 1,).padEnd(options.precision, '0');
+                value = value.substring(0, value.indexOf('.')) + options.decimal + valueTranform;
+            } else if (value.indexOf('.') != -1 && value.substring(value.indexOf('.') + 1,).length > options.precision) {
+                let valueTranform = value.substring(value.indexOf('.') + 1, (value.indexOf('.') + 1) + options.precision);
+                value = value.substring(0, value.indexOf('.')) + options.decimal + valueTranform;
+            } else if (value.indexOf('.') === -1 && options.precision) {
+                value = (value + options.decimal).padEnd(options.precision + (value + options.decimal).length, '0');
+            }
         }
 
         let numero = '';
