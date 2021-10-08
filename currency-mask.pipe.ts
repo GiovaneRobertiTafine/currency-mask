@@ -25,7 +25,7 @@ export class CurrencyMaskPipe implements PipeTransform {
 
     transform(value: string, args: Options): unknown {
         this.options = { ...args };
-        if (!this.options.precision || typeof this.options.precision !== 'number') this.options.precision = 2;
+        if ((!this.options.precision && this.options.precision != 0) || typeof this.options.precision !== 'number') this.options.precision = 2;
         if (this.options.allowNegative !== false || typeof this.options.allowNegative !== 'boolean') this.options.allowNegative = true;
         if (!this.options.thousands || typeof this.options.thousands !== 'string') this.options.thousands = '.';
         if (!this.options.decimal || typeof this.options.decimal !== 'string') this.options.decimal = ',';
