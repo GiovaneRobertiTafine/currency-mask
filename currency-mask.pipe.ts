@@ -1,5 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { CurrencyMaskServiceService } from './currency-mask-service.service';
+import { CurrencyMaskService } from './currency-mask.service';
 
 export interface Options {
     prefix?: string;
@@ -19,7 +19,7 @@ export interface Options {
 export class CurrencyMaskPipe implements PipeTransform {
     private options?: Options = {};
 
-    constructor(private currencyMaskService: CurrencyMaskServiceService) {
+    constructor(private currencyMaskService: CurrencyMaskService) {
 
     }
 
