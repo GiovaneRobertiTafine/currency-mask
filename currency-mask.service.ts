@@ -4,7 +4,7 @@ import { Options } from './currency-mask.directive';
 @Injectable({
     providedIn: 'root'
 })
-export class CurrencyMaskServiceService {
+export class CurrencyMaskService {
 
     constructor() { }
 
