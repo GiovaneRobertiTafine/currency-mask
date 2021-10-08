@@ -1,6 +1,6 @@
 import { AfterViewInit, Directive, ElementRef, forwardRef, HostListener, Input, OnInit, Renderer2 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CurrencyMaskServiceService } from "./currency-mask-service.service";
+import { CurrencyMaskService } from "./currency-mask.service";
 
 const noop = () => { };
 
@@ -35,7 +35,7 @@ export class CurrencyMaskDirective implements ControlValueAccessor, AfterViewIni
     private innerValue: any;
     private keyCode: number;
 
-    constructor(public elementRef: ElementRef, private currencyMaskService: CurrencyMaskServiceService, private renderer: Renderer2) {
+    constructor(public elementRef: ElementRef, private currencyMaskService: CurrencyMaskService, private renderer: Renderer2) {
         this.el = elementRef.nativeElement;
     }
 
